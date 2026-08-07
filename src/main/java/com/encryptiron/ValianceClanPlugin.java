@@ -15,6 +15,7 @@ import net.runelite.api.Client;
 import net.runelite.api.GameState;
 import net.runelite.api.events.GameStateChanged;
 import net.runelite.api.events.PlayerChanged;
+import net.runelite.api.gameval.VarbitID;
 import net.runelite.client.callback.ClientThread;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.EventBus;
@@ -83,7 +84,7 @@ public class ValianceClanPlugin extends Plugin
         eventBus.unregister(newClogEntry);
         eventBus.unregister(onBossKilled);
         
-        MessageHeaderData.resetPlayerName();
+        MessageHeaderData.reset();
         sendCollectionLog.resetNumClogsAccordingToVarp();
     }
 
@@ -102,7 +103,7 @@ public class ValianceClanPlugin extends Plugin
 		if (event.getGameState() == GameState.LOGIN_SCREEN ||
             event.getGameState() == GameState.HOPPING)
 		{
-            MessageHeaderData.resetPlayerName();
+            MessageHeaderData.reset();
 		}
     }
     
@@ -118,6 +119,10 @@ public class ValianceClanPlugin extends Plugin
             // If the player has been logged in, then we will have missed the varp change events that
             // happen during login. So we will manually scan and update our collection log count here.
             sendCollectionLog.updateNumClogsAccordingToVarp();
+
+            // Load the players account data
+            MessageHeaderData.setAccountId(client.getAccountHash());
+            MessageHeaderData.setAccountType(client.getVarbitValue(VarbitID.IRONMAN));
             MessageHeaderData.setPlayerName(client.getLocalPlayer().getName());
 
             return true;
